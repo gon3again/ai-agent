@@ -4,6 +4,7 @@ import argparse
 from google import genai
 from google.genai import types
 from prompts import system_prompt
+from call_function import available_functions
 
 
 parser = argparse.ArgumentParser(description="Chatbot")
@@ -21,7 +22,7 @@ if api_key == None:
 
 client = genai.Client(api_key=api_key)
 
-response = client.models.generate_content(model="gemini-2.5-flash",contents=messages,config=types.GenerateContentConfig(system_instruction=system_prompt,temperature=0))
+response = client.models.generate_content(model="gemini-2.5-flash",contents=messages,config=types.GenerateContentConfig(tools=[available_functions],system_instruction=system_prompt,temperature=0))
 if response.usage_metadata != None:
     prompt_tokens = response.usage_metadata.prompt_token_count
     response_tokens = response.usage_metadata.candidates_token_count
@@ -32,8 +33,15 @@ if response.usage_metadata != None:
 else:
     raise RuntimeError("usage_metadate = None")
 
-print(response.text)
+function_list = response.function_calls
+print(f"function_list:{function_list} len: {len(function_list)} is_None:{function_list == None}")
+if function_list != None:
+    for func in function_list:
+        print(f"Calling function: {func.name}({func.args})")
 
+print(response.text)
+print(f"function_calls: {response.function_calls}")
+(f"code_execution_result: {response.code_execution_result}")
 
 
 

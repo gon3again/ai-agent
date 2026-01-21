@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 def get_files_info(working_directory, directory="."):
     try:    
         working_directory_abs_path = os.path.abspath(working_directory)
@@ -30,3 +31,8 @@ def get_files_info(working_directory, directory="."):
 
 #get_files_info("/home/dustin/workspace/github.com/bootdotdev/curriculum/Ai-agent/calculator")
 #print(get_files_info("calculator", "pkg"))
+
+
+
+
+
