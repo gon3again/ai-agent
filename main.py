@@ -4,7 +4,7 @@ import argparse
 from google import genai
 from google.genai import types
 from prompts import system_prompt
-from call_function import available_functions
+from call_function import available_functions,call_function
 
 
 parser = argparse.ArgumentParser(description="Chatbot")
@@ -34,10 +34,23 @@ else:
     raise RuntimeError("usage_metadate = None")
 
 function_list = response.function_calls
+function_result_list = []
 print(f"function_list:{function_list} len: {len(function_list)} is_None:{function_list == None}")
 if function_list != None:
     for func in function_list:
         print(f"Calling function: {func.name}({func.args})")
+        function_call_result = call_function(func)
+        if function_call_result.parts == []:
+            raise Exception("empty parts in the function call result")
+        if function_call_result.parts[0].function_response == None:
+            raise Exception("function_response is None")
+        if function_call_result.parts[0].function_response.response == None:
+            raise Exception("function_response.response is None")
+        function_result_list.append(function_call_result.parts[0])
+        if args.verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
+        
+        
 
 print(response.text)
 print(f"function_calls: {response.function_calls}")
